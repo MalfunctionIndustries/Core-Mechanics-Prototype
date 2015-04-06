@@ -50,7 +50,25 @@ public class PlayerMovement : MonoBehaviour {
             }
         }
 
-        transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, Time.deltaTime * 20f);
+        if (!onGround)
+        {
+            Ray ray = new Ray(transform.position, transform.TransformDirection(Vector3.down));
+            
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, 3f))
+            {
+                Debug.DrawLine(transform.position, hit.point);
+                transform.rotation = Quaternion.Slerp(transform.rotation, hit.transform.rotation, Time.deltaTime * 5f);
+            }
+            else
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.identity, Time.deltaTime * 5f);
+            }
+        }
+        else
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, Time.deltaTime * 20f);
+        }
 
 	}
 
@@ -64,13 +82,16 @@ public class PlayerMovement : MonoBehaviour {
     void Jump () {
         if(onGround)
             rigidbody.AddForce(Vector3.up * jumpHeight);
-        onGround = false;
     }
 
     void OnCollisionStay(Collision collisionInfo)
     {
         desiredRotation = Quaternion.FromToRotation(Vector3.up, collisionInfo.contacts[0].normal);
         onGround = true;
+    }
+    void OnCollisionExit(Collision collisionInfo)
+    {
+        onGround = false;
     }
 
 }
