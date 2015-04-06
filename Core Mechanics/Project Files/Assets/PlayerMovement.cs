@@ -11,6 +11,9 @@ public class PlayerMovement : MonoBehaviour {
     public float jumpHeight;
 
     private Rigidbody rigidbody;
+    private Quaternion desiredRotation;
+
+    private bool onGround;
 
     enum Direction
     {
@@ -21,6 +24,7 @@ public class PlayerMovement : MonoBehaviour {
     void Start()
     {
         rigidbody = GetComponent<Rigidbody>();
+        onGround = false;
     }
 
 	void Update () {
@@ -46,6 +50,8 @@ public class PlayerMovement : MonoBehaviour {
             }
         }
 
+        transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, Time.deltaTime * 20f);
+
 	}
 
     void MoveChar (Direction direction) {
@@ -56,7 +62,15 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     void Jump () {
-        rigidbody.AddForce(Vector3.up * jumpHeight);
+        if(onGround)
+            rigidbody.AddForce(Vector3.up * jumpHeight);
+        onGround = false;
+    }
+
+    void OnCollisionStay(Collision collisionInfo)
+    {
+        desiredRotation = Quaternion.FromToRotation(Vector3.up, collisionInfo.contacts[0].normal);
+        onGround = true;
     }
 
 }
