@@ -73,15 +73,16 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
     void MoveChar (Direction direction) {
+        Vector3 left = transform.TransformDirection(Vector3.left);
         if (direction == Direction.left)
-            rigidbody.AddForce(Vector3.left * speed);
+            rigidbody.AddForce(left * speed);
         else
-            rigidbody.AddForce(Vector3.right * speed);
+            rigidbody.AddForce(left * -speed);
     }
 
     void Jump () {
         if(onGround)
-            rigidbody.AddForce(Vector3.up * jumpHeight);
+            rigidbody.AddForce(transform.TransformDirection(Vector3.up) * jumpHeight);
     }
 
     void OnCollisionStay(Collision collisionInfo)
